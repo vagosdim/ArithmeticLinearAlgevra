@@ -39,30 +39,49 @@ L = zeros(n,n);
 LT = zeros(n,n);
 
 #Cholesky Algorithm
-for i = 1:n
-  for j = 1:(i-1)
-    sum = 0;
+L(1,1) = A1(1,1);
+L(2,1) = A1(2,1)/L(1,1);
+L(2,2) = (A1(2,2)-L(2,1))**0.5;
+L(3,1) = A1(3,1)/L(1,1);
+L(3,2) = (A1(3,2)-L(3,1)*L(2,1))/L(2,2);
+L(3,3) = (A1(3,3)-L(3,2)**2-L(3,1)**2)**0.5;
+
+for i = 4:n
+  finish = i-1;
+  for j = 1:finish
     #Economy
-    if(A1(i,j) != 0)
-      for k = 1:(j-1)
+    if(A1(i,j) == 0)
+      L(i,j) = 0;
+    else
+      sum = 0;
+      finish2 = j-1;
+      for k = 1:finish2
         sum += L(i,j)*L(j,k);
       endfor
       L(i,j) = (A1(i,j)-sum)/L(j,j);
-    else  
-      L(i,j) = 0;
     endif
     #EndEconomy
   endfor
   sum = 0;
-  for k = 1:(i-1)
+  ###testing####
+  #if((i-3)<=0)
+   # for k=1:(i-1)
+    #  sum += L(i,k)**2;
+    #endfor
+  #else
+  start = i-1;
+  finish = i-3;
+  for k =start:(-1):finish
     sum += L(i,k)**2;
   endfor
-  L(i,i) = sqrt(A1(i,i)-sum);
+  #endif
+  ################  
+  L(i,i) = (A1(i,i)-sum)**0.5;
 endfor
 
 LT = L.';
-L = real(L);
-#L = single(L)
+#L = real(L)
+L = single(L);
 A1;
 LT;
 disp("END")
