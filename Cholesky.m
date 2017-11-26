@@ -1,8 +1,9 @@
 #Implementation of Cholesky's Algorithm
-
+#Cholesky Algorithm
 promt = 'Enter dimension n:';
 n = input(promt);
 
+#Initialiazing b1 b2
 b1 = zeros(n,1);
 b2 = ones(n,1);
 
@@ -12,77 +13,52 @@ b1(n,1) = 8; b1(n-1,1) = -1; b1(n-2,1) = -1;
 b2(1,1) = 9; b2(2,1) = 0; b2(3,1) = 0;
 b2(n,1) = 9; b2(n-1,1) = 0; b2(n-2,1) = 0;
 
+#Initiliazing A1,A2
 A1 = zeros(n,n);
 A2 = zeros(n,n);
 
-for i = 1:n
-  for j = 1:n
-    if(i == j)
-      A1(i,j) = 16;
-      A2(i,j) = 17;
-    elseif((i == j-1)||(j == i-1))
-      A1(i,j) = -9;
-      A2(i,j) = -9;
-    elseif((i == j-3)||(j == i-3))
-      A1(i,j) = 1;
-      A2(i,j) = 1;
-    endif
-  endfor
+tStart = tic;
+l1 = [16   -9    0    1    0];
+l1(end+1:numel(b1.'))=0;
+l2 = [-9   16   -9    0    1];
+l2(end+1:numel(b1.'))=0;
+l3 = [0   -9   16   -9    0  1];
+l3(end+1:numel(b1.'))=0;
+l4 = [1    0   -9   16   -9   0   1];
+l4(end+1:numel(b1.'))=0;
+  
+A1(1,:) = l1; A1(2,:) = l2;
+A1(3,:) = l3;A1(4,:) = l4;    
+for i = 5:n-4
+  A1(i,i-3) = 1;
+  A1(i,i+3) = 1;
+  A1(i,i-1) = -9;
+  A1(i,i+1) = -9;
+  A1(i,i) = 16;
+  
+  A2(i,i-3) = 1;
+  A2(i,i+3) = 1;
+  A2(i,i-1) = -9;
+  A2(i,i+1) = -9;
+  A2(i,i) = 17;
 endfor
 
-A1;
-A2;
-b1;
-b2;
+A1(n,:) = fliplr(l1); 
+A1(n-1,:) = fliplr(l2);
+A1(n-2,:) = fliplr(l3);
+A1(n-3,:) = fliplr(l4);
 
-L = zeros(n,n);
-LT = zeros(n,n);
+l1(1) += 1;l2(2) += 1;l3(3) += 1;l4(4) += 1;
+A2(1,:) = l1; A2(2,:) = l2;
+A2(3,:) = l3;A2(4,:) = l4; 
 
-#Cholesky Algorithm
-L(1,1) = A1(1,1);
-L(2,1) = A1(2,1)/L(1,1);
-L(2,2) = (A1(2,2)-L(2,1))**0.5;
-L(3,1) = A1(3,1)/L(1,1);
-L(3,2) = (A1(3,2)-L(3,1)*L(2,1))/L(2,2);
-L(3,3) = (A1(3,3)-L(3,2)**2-L(3,1)**2)**0.5;
+A2(n,:) = fliplr(l1); 
+A2(n-1,:) = fliplr(l2);
+A2(n-2,:) = fliplr(l3);
+A2(n-3,:) = fliplr(l4); 
 
-for i = 4:n
-  finish = i-1;
-  for j = 1:finish
-    #Economy
-    if(A1(i,j) == 0)
-      L(i,j) = 0;
-    else
-      sum = 0;
-      finish2 = j-1;
-      for k = 1:finish2
-        sum += L(i,j)*L(j,k);
-      endfor
-      L(i,j) = (A1(i,j)-sum)/L(j,j);
-    endif
-    #EndEconomy
-  endfor
-  sum = 0;
-  ###testing####
-  #if((i-3)<=0)
-   # for k=1:(i-1)
-    #  sum += L(i,k)**2;
-    #endfor
-  #else
-  start = i-1;
-  finish = i-3;
-  for k =start:(-1):finish
-    sum += L(i,k)**2;
-  endfor
-  #endif
-  ################  
-  L(i,i) = (A1(i,i)-sum)**0.5;
-endfor
-
-LT = L.';
-#L = real(L)
-L = single(L);
-A1;
-LT;
-disp("END")
-#End of Algorithm
+tEnd = toc(tStart)
+#End Initialization
+A1;A2;b1;b2;
+x1 = CholeskyFunction(A1,b1,n);
+x2 = CholeskyFunction(A2,b2,n);
